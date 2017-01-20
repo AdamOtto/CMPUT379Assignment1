@@ -6,3 +6,4 @@ all:
 	gcc  -o findpattern findpattern.c
 clean:
 	rm -f *.o *~
+	rm -f findpattern
