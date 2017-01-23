@@ -37,11 +37,11 @@ unsigned int findpattern(unsigned char *pattern, unsigned int patlength, struct 
 	char *locationOfWherePatternStarts = currentAddress;
 	char data = ' ';
 	
-	for(currentPage = 0; currentPage < /*pageTotal*/100; currentPage++)
+	for(currentPage = 0; currentPage < pageTotal; currentPage++)
 	{
 		printf("Start switch.\n");
 		int hold = determineIfReadWriteAddressLocation(currentAddress);
-		printf("hold is: %d", hold);
+		printf("hold is: %d\n", hold);
 		switch (hold)
 		{
 			//-1 means not read/write
@@ -80,31 +80,47 @@ unsigned int findpattern(unsigned char *pattern, unsigned int patlength, struct 
 int determineIfReadWriteAddressLocation(char * address)
 {
 	//printf("start initiate_handler.\n");
-	initiate_handler();
+	//initiate_handler();
+	char readWriter;
+	
+	newSignalHandler.sa_handler = handler;
+	sigemptyset(&newSignalHandler.sa_mask);
+	newSignalHandler.sa_flags = 0;
+	if (sigaction(SIGSEGV, &newSignalHandler, &oldSignalHandler) == -1)
+	{
+		err(1, "Cannot save previous sigaction.\n");
+	}
+
+
 	//printf("start sigsetjmp.\n");
 	int SignalValue = sigsetjmp(signalBuffer, 1);
-	printf("SignalValue: %d\n", SignalValue);
-	if ( SignalValue != 0)
+	if ( SignalValue == 0)
+		readWriter = *address;
+	else
 	{
 		//Cant read address.
 		printf("cant read address.\n");
-		restore_handler();
+		sigaction(SIGSEGV, &oldSignalHandler, NULL);
 		return -1;
 	}
 
 	SignalValue = sigsetjmp(signalBuffer, 1);
-	printf("SignalValue: %d\n", SignalValue);
-	if ( SignalValue != 0)
+
+	if ( SignalValue == 0)
+	{
+		*address = readWriter;
+	}
+	else
 	{
 		//Cant write to address.
 		printf("cant write address, but can read.\n");
-		restore_handler();
+		sigaction(SIGSEGV, &oldSignalHandler, NULL);
 		return 0;
 	}
-
+	
+	*address = readWriter;
 	printf("can read and write to address.\n");
-	restore_handler();
-	printf("returning to findpattern...\n");
+	sigaction(SIGSEGV, &oldSignalHandler, NULL);
 	return 1;
 }
 
@@ -114,13 +130,9 @@ void initiate_handler() {
 	newSignalHandler.sa_handler = handler;
 	sigemptyset(&newSignalHandler.sa_mask);
 	newSignalHandler.sa_flags = 0;
-	if (sigaction(SIGSEGV, NULL, &oldSignalHandler) == -1)
+	if (sigaction(SIGSEGV, &newSignalHandler, &oldSignalHandler) == -1)
 	{
 		err(1, "Cannot save previous sigaction.\n");
-	}
-	if (sigaction(SIGSEGV, &newSignalHandler, NULL) == -1)
-	{
-		err(1, "Cannot set next sigaction.\n");
 	}	
 }
 
