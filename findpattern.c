@@ -1,7 +1,8 @@
 #include "findpattern.h"
+#include <setjmp.h>
+#include <signal.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <signal.h>
 
 int main() {
 	
