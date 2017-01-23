@@ -7,7 +7,7 @@ int main() {
 	
 	/*For testing purposes -------*/
 	unsigned char *testPattern = (char*)'f';
-	unsigned int testPatLength = 8;
+	unsigned int testPatLength = 1;
 	struct patmatch *testLocations[10];
 	unsigned int testLocLength = 10;
 	/*----------------------------*/
@@ -28,23 +28,22 @@ unsigned int findpattern(unsigned char *pattern, unsigned int patlength, struct 
 	
 	for(currentPage = 0; currentPage < pageTotal; currentPage++)
 	{
-		/*This causes program to crash.  The program doesn't like reading things from
-		pointers for some reason.		
-		.*/
-		/*
-		data = *currentAddress;
-		
-		if(data == *pattern)
+		printf("current address: 0x%x", (int)currentAddress);
+		data = currentAddress++;
+		printf(" current data: %c\n",data);
+
+		if(data == &pattern)
 		{
+			printf("Pattern found...\n");
 			patternCount++;
 		}
 		else
 			patternCount = 0;
-		*/
+		
 		
 		if(patternCount == patlength)
 		{
-			printf("Pattern found at: %x\n", (int)currentAddress );
+			printf("Pattern found at: 0x%x\n", (int)currentAddress );
 		}
 
 		currentAddress++;
