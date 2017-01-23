@@ -3,8 +3,6 @@
 #include <signal.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <setjmp.h>
-#include <signal.h>
 
 int determineIfReadWriteAddressLocation(char *);
 void initiate_handler();
