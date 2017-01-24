@@ -17,63 +17,85 @@ static struct sigaction newSignalHandler, oldSignalHandler;
 int main(int argc, char *argv[]) {
 	
 	/*For testing purposes -------*/
-	unsigned char *testPattern = (char*)'f';
+	unsigned char *testPattern = (char*)'A';
 	unsigned int testPatLength = 1;
 	struct patmatch *testLocations[10];
 	unsigned int testLocLength = 10;
 	/*----------------------------*/
-	findpattern((char*)testPattern, testPatLength, (struct patmatch *)testLocations, testLocLength);
-	return 0;
+
+	int count = findpattern((char*)testPattern, testPatLength, (struct patmatch *)testLocations, testLocLength);
+	return count;
 }
 
 
 unsigned int findpattern(unsigned char *pattern, unsigned int patlength, struct patmatch *locations, unsigned int loclength)
 {
 	char *currentAddress = 0x00000000;
+	char *patternFoundAddress = 0x00000000;
 	int pageSize = getpagesize();
-	int pageTotal = 0xffffffff / pageSize;
-	int currentPage = 0;
+	long pageTotal = 0xffffffff / pageSize;
+	long currentPage = 0;
 	int patternCount = 0;
 	char *locationOfWherePatternStarts = currentAddress;
 	char data = ' ';
+
+	char locationLengthCount = 0;
+	int MemoryReadWriteType;
+	int patternFoundCount = 0;	
 	
-	for(currentPage = 0; currentPage < pageTotal; currentPage++)
+	for(currentPage = 0; currentPage <= pageTotal; currentPage++)
 	{
-		printf("Start switch.\n");
-		int hold = determineIfReadWriteAddressLocation(currentAddress);
-		printf("hold is: %d\n", hold);
-		switch (hold)
+		MemoryReadWriteType = determineIfReadWriteAddressLocation(currentAddress);
+		switch (MemoryReadWriteType)
 		{
 			//-1 means not read/write
-			case -1: currentAddress++; continue; break;
+			case -1:
+				currentAddress += pageSize; 
+				continue;
 			//0 means read, not write
 			case 0:
-				data = *currentAddress++; printf(" current data: %c\n",data); break;
+				data = *currentAddress;
+				break;
 			//1 means read and write
 			case 1:
-				printf("attempting to read from address...");
-				data = *currentAddress++;
-				printf(" current data: %c\n",data);
+				data = *currentAddress;
 				break;
 		}
-		printf("Current data: %c\n",data);
 
-		if(data == *pattern)
+		//printf("Current Address: 0x%x ", (int)currentAddress);
+		//printf("Current data: %c\n",data);
+		currentAddress += pageSize;
+		
+		if(data == (int)pattern)
 		{
-			printf("Pattern found...\n");
+			//printf("Pattern segment found...\n");
+			if(patternCount == 0)
+				patternFoundAddress = currentAddress;
 			patternCount++;
 		}
 		else
+		{
+			//printf("No pattern found...\n");
 			patternCount = 0;
+		}
 		
 		
 		if(patternCount == patlength)
 		{
-			printf("Pattern found at: 0x%x\n", (int)currentAddress );
+			printf("Pattern found at: 0x%x\n", (int)patternFoundAddress );
+			if(locationLengthCount < loclength)
+			{
+				locations[locationLengthCount].location = (int)patternFoundAddress;
+				if(MemoryReadWriteType == 0)
+					locations[locationLengthCount].mode = (char)'0';
+				else
+					locations[locationLengthCount].mode = (char)'1';
+				locationLengthCount++;
+			}
+			patternFoundCount++;
 		}
-
-		currentAddress++;
 	}
+	return patternFoundCount;
 }
 
 
@@ -99,7 +121,7 @@ int determineIfReadWriteAddressLocation(char * address)
 	else
 	{
 		//Cant read address.
-		printf("cant read address.\n");
+		//printf("cant read address.\n");
 		sigaction(SIGSEGV, &oldSignalHandler, NULL);
 		return -1;
 	}
@@ -113,13 +135,13 @@ int determineIfReadWriteAddressLocation(char * address)
 	else
 	{
 		//Cant write to address.
-		printf("cant write address, but can read.\n");
+		//printf("cant write address, but can read.\n");
 		sigaction(SIGSEGV, &oldSignalHandler, NULL);
 		return 0;
 	}
 	
 	*address = readWriter;
-	printf("can read and write to address.\n");
+	//printf("can read and write to address.\n");
 	sigaction(SIGSEGV, &oldSignalHandler, NULL);
 	return 1;
 }
