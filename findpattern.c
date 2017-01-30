@@ -25,7 +25,17 @@ int main(int argc, char *argv[]) {
 	return count;
 }
 
+/*
+Scans the addresss space of the calling process and determines the
+access permissions to all possible memory locations.
 
+Returns the total number of locations where the pattern was found.
+
+pattern: array of bytes
+patlength: length of pattern array
+locations: array of patmatch
+loclength: length of locations array
+*/
 unsigned int findpattern(unsigned char *pattern, unsigned int patlength, struct patmatch *locations, unsigned int loclength)
 {
 	char *currentAddress = 0x00000000;
