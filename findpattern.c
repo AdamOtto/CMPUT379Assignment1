@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
 	
 	/*For testing purposes -------*/
 	unsigned char *testPattern = (char*)'A';
-	unsigned int testPatLength = 1;
+	unsigned int testPatLength = 2;
 	struct patmatch *testLocations[10];
 	unsigned int testLocLength = 10;
 	/*----------------------------*/
@@ -31,66 +31,79 @@ unsigned int findpattern(unsigned char *pattern, unsigned int patlength, struct 
 	char *currentAddress = 0x00000000;
 	char *patternFoundAddress = 0x00000000;
 	int pageSize = getpagesize();
-	long pageTotal = 0xffffffff / pageSize;
+	printf("pageSize: %d\n",pageSize);
+	long pageTotal = (0xffffffff) / pageSize;
+	printf("pageTotal: %ld\n",pageTotal);
 	long currentPage = 0;
 	int patternCount = 0;
-	char *locationOfWherePatternStarts = currentAddress;
 	char data = ' ';
-
-	char locationLengthCount = 0;
+	
+	char locationIndex = 0;
 	int MemoryReadWriteType;
 	int patternFoundCount = 0;	
-	
-	for(currentPage = 0; currentPage <= pageTotal; currentPage++)
-	{
-		MemoryReadWriteType = determineIfReadWriteAddressLocation(currentAddress);
-		switch (MemoryReadWriteType)
-		{
-			//-1 means not read/write
-			case -1:
-				currentAddress += pageSize; 
-				continue;
-			//0 means read, not write
-			case 0:
-				data = *currentAddress;
-				break;
-			//1 means read and write
-			case 1:
-				data = *currentAddress;
-				break;
-		}
 
-		//printf("Current Address: 0x%x ", (int)currentAddress);
-		//printf("Current data: %c\n",data);
-		currentAddress += pageSize;
+	for(currentPage = 0; currentPage < pageTotal; currentPage++)
+	{
+		if(currentPage == pageTotal){
+			printf("last address read: 0x%x\n",(int)currentAddress);}
 		
-		if(data == (int)pattern)
+		long i;	
+		for(i = 0; i < pageSize; i++)
 		{
-			//printf("Pattern segment found...\n");
-			if(patternCount == 0)
-				patternFoundAddress = currentAddress;
-			patternCount++;
-		}
-		else
-		{
-			//printf("No pattern found...\n");
-			patternCount = 0;
-		}
-		
-		
-		if(patternCount == patlength)
-		{
-			printf("Pattern found at: 0x%x\n", (int)patternFoundAddress );
-			if(locationLengthCount < loclength)
+			MemoryReadWriteType = determineIfReadWriteAddressLocation(currentAddress);
+			/*			
+			switch (MemoryReadWriteType)
 			{
-				locations[locationLengthCount].location = (int)patternFoundAddress;
-				if(MemoryReadWriteType == 0)
-					locations[locationLengthCount].mode = (char)'0';
-				else
-					locations[locationLengthCount].mode = (char)'1';
-				locationLengthCount++;
+				//-1 means not read/write
+				case -1:
+					currentAddress += pageSize;					
+					break;
+				//0 means read, not write
+				case 0:
+					data = *currentAddress;
+					break;
+				//1 means read and write
+				case 1:
+					data = *currentAddress;
+					break;
 			}
-			patternFoundCount++;
+			*/
+			if(MemoryReadWriteType == -1)
+			{
+				currentAddress += pageSize;
+				break;
+			}
+
+			//printf("reading: 0x%x\n", (int)currentAddress);
+			currentAddress += 1;
+
+			if(data == (int)pattern)
+			{
+				//printf("Pattern segment found...\n");
+				if(patternCount == 0)
+					patternFoundAddress = currentAddress;
+				patternCount++;
+			}
+			else
+			{
+				//printf("No pattern found...\n");
+				patternCount = 0;
+			}
+		
+			if(patternCount == patlength)
+			{
+				printf("Pattern found at: 0x%x\n", (int)patternFoundAddress );
+				if(locationIndex < loclength)
+				{
+					locations[locationIndex].location = (int)patternFoundAddress;
+					if(MemoryReadWriteType == MEM_RW)
+						locations[locationIndex].mode = (char)MEM_RW;
+					else
+						locations[locationIndex].mode = (char)MEM_RO;
+					locationIndex++;
+				}
+				patternFoundCount++;
+			}
 		}
 	}
 	return patternFoundCount;
@@ -112,7 +125,7 @@ int determineIfReadWriteAddressLocation(char * address)
 	}
 
 
-	//printf("start sigsetjmp.\n");
+	//Determine if address is readable.
 	int SignalValue = sigsetjmp(signalBuffer, 1);
 	if ( SignalValue == 0)
 		readWriter = *address;
@@ -123,9 +136,9 @@ int determineIfReadWriteAddressLocation(char * address)
 		sigaction(SIGSEGV, &oldSignalHandler, NULL);
 		return -1;
 	}
-
+	
+	//Determine if address is writable.
 	SignalValue = sigsetjmp(signalBuffer, 1);
-
 	if ( SignalValue == 0)
 	{
 		*address = readWriter;
@@ -138,34 +151,12 @@ int determineIfReadWriteAddressLocation(char * address)
 		return 0;
 	}
 	
-	*address = readWriter;
-	//printf("can read and write to address.\n");
 	sigaction(SIGSEGV, &oldSignalHandler, NULL);
 	return 1;
 }
 
-
-
-void initiate_handler() {
-	newSignalHandler.sa_handler = handler;
-	sigemptyset(&newSignalHandler.sa_mask);
-	newSignalHandler.sa_flags = 0;
-	if (sigaction(SIGSEGV, &newSignalHandler, &oldSignalHandler) == -1)
-	{
-		err(1, "Cannot save previous sigaction.\n");
-	}	
-}
-
-
-void restore_handler() {
-	if (sigaction(SIGSEGV, &oldSignalHandler, NULL) == -1) {
-		err(1, "Cannot restore previous signal handler.\n");
-	}
-}
-
-
 void handler(int signo) {
 	siglongjmp(signalBuffer, 1);
-	printf("Does this print?");
+	//printf("Does this print?");
 }
 
