@@ -5,9 +5,6 @@
 #include <unistd.h>
 
 int determineIfReadWriteAddressLocation(char *);
-void initiate_handler();
-void restore_handler();
-void handler(int);
 
 static sigjmp_buf signalBuffer;
 static struct sigaction newSignalHandler, oldSignalHandler;
@@ -45,7 +42,6 @@ unsigned int findpattern(unsigned char *pattern, unsigned int patlength, struct 
 	long pageTotal = 0xffffffff / pageSize;
 	long currentPage = 0;
 	int patternCount = 0;
-	char *locationOfWherePatternStarts = currentAddress;
 	char data = ' ';
 
 	char locationLengthCount = 0;
@@ -154,29 +150,3 @@ int determineIfReadWriteAddressLocation(char * address)
 	sigaction(SIGSEGV, &oldSignalHandler, NULL);
 	return 1;
 }
-
-
-
-void initiate_handler() {
-	newSignalHandler.sa_handler = handler;
-	sigemptyset(&newSignalHandler.sa_mask);
-	newSignalHandler.sa_flags = 0;
-	if (sigaction(SIGSEGV, &newSignalHandler, &oldSignalHandler) == -1)
-	{
-		err(1, "Cannot save previous sigaction.\n");
-	}	
-}
-
-
-void restore_handler() {
-	if (sigaction(SIGSEGV, &oldSignalHandler, NULL) == -1) {
-		err(1, "Cannot restore previous signal handler.\n");
-	}
-}
-
-
-void handler(int signo) {
-	siglongjmp(signalBuffer, 1);
-	printf("Does this print?");
-}
-
