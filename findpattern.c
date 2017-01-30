@@ -5,9 +5,6 @@
 #include <unistd.h>
 
 int determineIfReadWriteAddressLocation(char *);
-void initiate_handler();
-void restore_handler();
-void handler(int);
 
 static sigjmp_buf signalBuffer;
 static struct sigaction newSignalHandler, oldSignalHandler;
@@ -25,7 +22,18 @@ int main(int argc, char *argv[]) {
 	return count;
 }
 
+/*
+Scans the addresss space of the calling process and return in the
+locations array all the different locations at which the pattern
+is found.
 
+Returns the total number of locations where the pattern was found.
+
+pattern: array of bytes
+patlength: length of pattern array
+locations: array of patmatch
+loclength: length of locations array
+*/
 unsigned int findpattern(unsigned char *pattern, unsigned int patlength, struct patmatch *locations, unsigned int loclength)
 {
 	char *currentAddress = 0x00000000;
@@ -154,9 +162,12 @@ int determineIfReadWriteAddressLocation(char * address)
 	sigaction(SIGSEGV, &oldSignalHandler, NULL);
 	return 1;
 }
+<<<<<<< HEAD
 
 void handler(int signo) {
 	siglongjmp(signalBuffer, 1);
 	//printf("Does this print?");
 }
 
+=======
+>>>>>>> 10f4fc8ebdfd9e08e055692da812557eb3ed1fe8
