@@ -17,4 +17,4 @@ driver1: ../findpattern.o driver1.o
 	$(CC) $(CFLAGS) $^ -o $@
 clean:
 	rm -f *.o *~
-	rm -f driver*
+	rm -f driver?
