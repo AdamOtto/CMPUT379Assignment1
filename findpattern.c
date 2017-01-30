@@ -117,6 +117,10 @@ unsigned int findpattern(unsigned char *pattern, unsigned int patlength, struct 
 	return patternFoundCount;
 }
 
+void handler(int signo) {
+	siglongjmp(signalBuffer, 1);
+	//printf("Does this print?");
+}
 
 int determineIfReadWriteAddressLocation(char * address)
 {
@@ -162,12 +166,3 @@ int determineIfReadWriteAddressLocation(char * address)
 	sigaction(SIGSEGV, &oldSignalHandler, NULL);
 	return 1;
 }
-<<<<<<< HEAD
-
-void handler(int signo) {
-	siglongjmp(signalBuffer, 1);
-	//printf("Does this print?");
-}
-
-=======
->>>>>>> 10f4fc8ebdfd9e08e055692da812557eb3ed1fe8
