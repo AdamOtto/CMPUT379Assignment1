@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 	
 	/*For testing purposes -------*/
 	unsigned char *testPattern = (char*)'A';
-	unsigned int testPatLength = 2;
+	unsigned int testPatLength = 1;
 	struct patmatch *testLocations[10];
 	unsigned int testLocLength = 10;
 	/*----------------------------*/
@@ -39,9 +39,7 @@ unsigned int findpattern(unsigned char *pattern, unsigned int patlength, struct 
 	char *currentAddress = 0x00000000;
 	char *patternFoundAddress = 0x00000000;
 	int pageSize = getpagesize();
-	printf("pageSize: %d\n",pageSize);
 	long pageTotal = (0xffffffff) / pageSize;
-	printf("pageTotal: %ld\n",pageTotal);
 	long currentPage = 0;
 	int patternCount = 0;
 	char data = ' ';
@@ -50,57 +48,38 @@ unsigned int findpattern(unsigned char *pattern, unsigned int patlength, struct 
 	int MemoryReadWriteType;
 	int patternFoundCount = 0;	
 
-	for(currentPage = 0; currentPage < pageTotal; currentPage++)
+	for(currentPage = 0; currentPage <= pageTotal; currentPage++)
 	{
-		if(currentPage == pageTotal){
-			printf("last address read: 0x%x\n",(int)currentAddress);}
-		
 		long i;	
 		for(i = 0; i < pageSize; i++)
 		{
 			MemoryReadWriteType = determineIfReadWriteAddressLocation(currentAddress);
-			/*			
-			switch (MemoryReadWriteType)
-			{
-				//-1 means not read/write
-				case -1:
-					currentAddress += pageSize;					
-					break;
-				//0 means read, not write
-				case 0:
-					data = *currentAddress;
-					break;
-				//1 means read and write
-				case 1:
-					data = *currentAddress;
-					break;
-			}
-			*/
+			
 			if(MemoryReadWriteType == -1)
 			{
 				currentAddress += pageSize;
 				break;
 			}
+			
+			data = *currentAddress;			
 
-			//printf("reading: 0x%x\n", (int)currentAddress);
 			currentAddress += 1;
 
 			if(data == (int)pattern)
 			{
-				//printf("Pattern segment found...\n");
 				if(patternCount == 0)
 					patternFoundAddress = currentAddress;
 				patternCount++;
 			}
 			else
 			{
-				//printf("No pattern found...\n");
 				patternCount = 0;
 			}
 		
 			if(patternCount == patlength)
 			{
-				printf("Pattern found at: 0x%x\n", (int)patternFoundAddress );
+				//printf("Pattern found at: 0x%x\n", (int)patternFoundAddress );
+				
 				if(locationIndex < loclength)
 				{
 					locations[locationIndex].location = (int)patternFoundAddress;
@@ -110,11 +89,19 @@ unsigned int findpattern(unsigned char *pattern, unsigned int patlength, struct 
 						locations[locationIndex].mode = (char)MEM_RO;
 					locationIndex++;
 				}
+				
 				patternFoundCount++;
 			}
 		}
 	}
+	//printf("last address read: 0x%x\n",(int)currentAddress);
 	return patternFoundCount;
+}
+
+
+void handler(int signo) {
+	siglongjmp(signalBuffer, 1);
+	//printf("Does this print?");
 }
 
 
@@ -162,12 +149,4 @@ int determineIfReadWriteAddressLocation(char * address)
 	sigaction(SIGSEGV, &oldSignalHandler, NULL);
 	return 1;
 }
-<<<<<<< HEAD
 
-void handler(int signo) {
-	siglongjmp(signalBuffer, 1);
-	//printf("Does this print?");
-}
-
-=======
->>>>>>> 10f4fc8ebdfd9e08e055692da812557eb3ed1fe8
