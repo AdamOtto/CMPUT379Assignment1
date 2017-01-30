@@ -26,8 +26,9 @@ int main(int argc, char *argv[]) {
 }
 
 /*
-Scans the addresss space of the calling process and determines the
-access permissions to all possible memory locations.
+Scans the addresss space of the calling process and return in the
+locations array all the different locations at which the pattern
+is found.
 
 Returns the total number of locations where the pattern was found.
 
