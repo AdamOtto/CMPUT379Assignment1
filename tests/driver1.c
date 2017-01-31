@@ -11,7 +11,7 @@ int main() {
 	unsigned int patlength = 2;
 
 	struct patmatch locations[10];
-	unsigned int loclength = sizeof(locations) / sizeof(struct patmatch);
+	unsigned int loclength = 10;
 	
 	
 	printf("Test 1:\n");
