@@ -3,23 +3,26 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-unsigned int PAGE_SIZE = getpagesize();
+
 
 int main() {
+	
+	unsigned int PAGE_SIZE = getpagesize();
 
 	unsigned char *pattern = (char *) 'A';
 	unsigned int patlength = 2;
 
 	struct patmatch locations[10];
-	unsigned int loclength = sizeof(locations) / sizeof(patmatch);
+	unsigned int loclength = sizeof(locations) / sizeof(struct patmatch);
 	
 	
 	printf("Test 1:\n");
-	unsigned int number = findpattern(pattern, patlength, locations, loclength)
+	unsigned int number = findpattern(pattern, patlength, locations, loclength);
 	
 	//First test	
 	printf("Pass 1\nTotal Matches: %d\n", number);
-	int i;	
+	int i;
+	/*	
 	for (i = 0; i < loclength; i++)
 	{
 		if(locations[i].location != NULL && locations[i].mode != NULL)
@@ -27,27 +30,30 @@ int main() {
 			printf("%d\t%c",locations[i].location, locations[i].mode=='0'?"MEM_RW":"MEM_RO");
 		}			
 	}
-	
+	*/
+
 	//This address may need to be changed later if its read only.
-	int *address = 0xaaaaaaaa;
+	/*
+	char *address = 0xAAAAAAAA;
 	for(i = 0; i < patlength; i++)
 	{
 		*address = 'A';
 		address++;
 	}
-	
+	*/
+
 	unsigned char *pattern2 = (char *) 'A';
 	unsigned int patlength2 = 2;
 
 	struct patmatch locations2[10];
-	unsigned int loclength2 = sizeof(locations) / sizeof(patmatch);	
+	unsigned int loclength2 = sizeof(locations) / sizeof(struct patmatch);	
 	
 	//Second test with changes.
-	unsigned int number = findpattern(pattern2, patlength2, locations2, loclength2)
+	printf("Pass 2\n");
+	number = findpattern(pattern2, patlength2, locations2, loclength2);
+	printf("Total Matches: %d\n", number);
 
-	printf("Pass 2\nTotal Matches: %d\n", number);
-	
-	int i;	
+	/*
 	for (i = 0; i < loclength; i++)
 	{
 		if(locations[i].location != NULL && locations[i].mode != NULL)
@@ -60,7 +66,7 @@ int main() {
 			);
 		}			
 	}
-	
+	*/
 }
 
 
