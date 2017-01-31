@@ -1,9 +1,11 @@
 CC = gcc
-CFLAGS = -std=c99 -m32
+CFLAGS = -m32
 
-all:
-	gcc findpattern.c -o findpattern.o
-	gcc  -o findpattern findpattern.c
+tests: findpattern.o
+
+findpattern.o: findpattern.c findpattern.h
+	$(CC) $(CFLAGS) -c $<
+	$(MAKE) -C tests
+
 clean:
-	rm -f *.o *~
-	rm -f findpattern
+	rm -f *.o *~ *.gch
