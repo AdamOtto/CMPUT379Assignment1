@@ -10,6 +10,21 @@ static sigjmp_buf signalBuffer;
 static struct sigaction newSignalHandler, oldSignalHandler;
 
 /*
+int main(int argc, char *argv[]) {
+	
+	/*For testing purposes -------/
+	unsigned char *testPattern = (char*)'A';
+	unsigned int testPatLength = 1;
+	struct patmatch *testLocations[10];
+	unsigned int testLocLength = 10;
+	/*----------------------------/
+
+	int count = findpattern((char*)testPattern, testPatLength, (struct patmatch *)testLocations, testLocLength);
+	return count;
+}
+*/
+
+/*
 Scans the addresss space of the calling process and return in the
 locations array all the different locations at which the pattern
 is found.
