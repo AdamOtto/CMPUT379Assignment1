@@ -84,11 +84,11 @@ unsigned int findpattern(unsigned char *pattern, unsigned int patlength, struct 
 				
 				if(locationIndex < loclength)
 				{
-					locations[locationIndex].location = (int)patternFoundAddress;
+					(locations[locationIndex]).location = (int)patternFoundAddress;
 					if(MemoryReadWriteType == MEM_RW)
-						locations[locationIndex].mode = (char)MEM_RW;
+						(locations[locationIndex]).mode = '0';//MEM_RW;
 					else
-						locations[locationIndex].mode = (char)MEM_RO;
+						(locations[locationIndex]).mode = '1';//MEM_RO;
 					locationIndex++;
 				}
 				
@@ -105,6 +105,16 @@ void handler(int signo) {
 	//printf("Does this print?");
 }
 
+/*
+Scans the given address and determines if it is read, read/write or neither using signals
+
+Returns the either -1,0 or 1.
+-1 means address isn't read or write
+0 means read only
+1 means read and write.
+
+address: char containing the address to scan.
+*/
 int determineIfReadWriteAddressLocation(char * address)
 {
 	//printf("start initiate_handler.\n");

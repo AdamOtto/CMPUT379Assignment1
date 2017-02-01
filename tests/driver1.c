@@ -1,12 +1,16 @@
 #include "../findpattern.h"
+#include <setjmp.h>
+#include <signal.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
+
+void createPattern(unsigned char *pattern, unsigned int patlength);
+
+static sigjmp_buf signalBuffer;
+static struct sigaction newSignalHandler, oldSignalHandler;
 
 int main() {
 	
-	unsigned int PAGE_SIZE = getpagesize();
-
 	unsigned char *pattern = (char *) 'A';
 	unsigned int patlength = 2;
 
@@ -20,57 +24,85 @@ int main() {
 	//First test	
 	printf("Pass 1\nTotal Matches: %d\n", number);
 	int i;
-	/*	
+		
 	for (i = 0; i < loclength; i++)
 	{
-		if(locations[i].location != NULL && locations[i].mode != NULL)
-		{
-			printf("%d\t%c",locations[i].location, locations[i].mode=='0'?"MEM_RW":"MEM_RO");
-		}			
+		if( i == number)
+			break;
+		printf("0x%x\t%c\n",(locations[i]).location, (locations[i]).mode);
+					
 	}
-	*/
+	
 
-	//This address may need to be changed later if its read only.
-	/*
-	char *address = 0xAAAAAAAA;
-	for(i = 0; i < patlength; i++)
-	{
-		*address = 'A';
-		address++;
-	}
-	*/
+	createPattern(pattern, patlength);
 
 	unsigned char *pattern2 = (char *) 'A';
 	unsigned int patlength2 = 2;
 
 	struct patmatch locations2[10];
-	unsigned int loclength2 = sizeof(locations) / sizeof(struct patmatch);	
+	unsigned int loclength2 = 10;	
 	
 	//Second test with changes.
 	printf("Pass 2\n");
 	number = findpattern(pattern2, patlength2, locations2, loclength2);
 	printf("Total Matches: %d\n", number);
+	int oldFindPatternIndex = 0;
 
-	/*
-	for (i = 0; i < loclength; i++)
+	for (i = 0; i < loclength2; i++)
 	{
-		if(locations[i].location != NULL && locations[i].mode != NULL)
+		if( i == number)
+			break;
+		
+		printf("0x%x\t%c",(locations2[i]).location, (locations2[i]).mode);
+
+		if( (locations2[i]).location == (locations[oldFindPatternIndex]).location )
 		{
-			printf("%d\t%c\t%c",locations2[i].location, locations2[i].mode=='0'?"MEM_RW":"MEM_RO",
-				(locations2[i].mode != NULL && locations[i] == NULL)?
-					"N"
-					:
-					( locations2[i].mode == locations[i].mode ? "U":"C")
-			);
-		}			
+			if((locations2[i]).mode == (locations[oldFindPatternIndex]).mode)
+				printf("\tU\n");
+			else
+				printf("\tC\n");
+			oldFindPatternIndex++;
+		}
+		else
+			printf("\tN\n");					
 	}
-	*/
 }
 
+/*
+Creates a new pattern at the first read/write location found
 
+Returns nothing.
 
-
-
-
-
+pattern: char containing pattern character.
+patlength: length of the pattern
+*/
+void createPattern(unsigned char *pattern, unsigned int patlength)
+{
+	char *currentAddress = 0x00000000;
+	int pageSize = getpagesize();
+	long pageTotal = (0xffffffff) / pageSize;
+	long currentPage = 0;
+	int MemoryReadWriteType;
+	
+	for(currentPage = 0; currentPage <= pageTotal; currentPage++)
+	{
+		MemoryReadWriteType = determineIfReadWriteAddressLocation(currentAddress);
+			
+		if(MemoryReadWriteType == 0 || MemoryReadWriteType == -1)
+		{
+			currentAddress += pageSize;
+			continue;
+		}
+		else if(MemoryReadWriteType == 1)
+		{
+			int i;
+			for(i = 0; i < patlength ; i++)
+			{	
+				//*currentAddress = *pattern;
+				currentAddress++;
+			}
+			return;
+		}
+	}
+}
 
