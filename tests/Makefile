@@ -2,15 +2,20 @@ CC = gcc
 CFLAGS = -m32
 VPATH = .:../
 
-all: driver1
+all: driver1 driver2 driver3
 
-%.o: %.c
+%.o: %.c findpattern.h
 	$(CC) $(CFLAGS) -c $<
-
-driver1.o: findpattern.h
 
 driver1: findpattern.o driver1.o
 	$(CC) $(CFLAGS) $^ -o $@
+
+driver2: findpattern.o driver2.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+driver3: findpattern.o driver3.o
+	$(CC) $(CFLAGS) $^ -o $@
+
 clean:
 	rm -f *~ *.o
-	rm driver1
+	rm driver*

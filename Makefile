@@ -1,10 +1,9 @@
 CC = gcc
 CFLAGS = -m32
-VPATH = .:tests/
 
-tests: findpattern.o driver
+tests: findpattern.o drivers
 
-driver: driver1.c
+drivers: tests/driver*.c
 	cd tests && $(MAKE)
 
 findpattern.o: findpattern.c findpattern.h

@@ -121,4 +121,3 @@ void createPattern(unsigned char pattern, unsigned int patlength)
 		}
 	}
 }
-
