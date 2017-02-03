@@ -10,5 +10,5 @@ findpattern.o: findpattern.c findpattern.h
 	$(CC) $(CFLAGS) -c $<
 
 clean:
-	rm -f *.o *~ *.gch
+	rm -f *.o *~
 	cd tests && $(MAKE) clean
