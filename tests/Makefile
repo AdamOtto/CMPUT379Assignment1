@@ -1,5 +1,3 @@
-CC = gcc
-CFLAGS = -m32
 VPATH = .:../
 
 all: driver1 driver2 driver3
