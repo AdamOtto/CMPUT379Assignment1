@@ -100,9 +100,11 @@ unsigned int findpattern(unsigned char *pattern, unsigned int patlength, struct 
 	return patternFoundCount;
 }
 
-void handler(int signo) {
+/*
+A handler to help process signals.
+*/
+void handler(int signalNum) {
 	siglongjmp(signalBuffer, 1);
-	//printf("Does this print?");
 }
 
 /*
@@ -118,16 +120,13 @@ address: char containing the address to scan.
 int determineIfReadWriteAddressLocation(char * address)
 {
 	//printf("start initiate_handler.\n");
-	//initiate_handler();
 	char readWriter;
 	
 	newSignalHandler.sa_handler = handler;
 	sigemptyset(&newSignalHandler.sa_mask);
 	newSignalHandler.sa_flags = 0;
 	if (sigaction(SIGSEGV, &newSignalHandler, &oldSignalHandler) == -1)
-	{
-		err(1, "Cannot save previous sigaction.\n");
-	}
+		err(1, "Last sigaction not saved.\n");
 
 
 	//Determine if address is readable.
@@ -137,7 +136,6 @@ int determineIfReadWriteAddressLocation(char * address)
 	else
 	{
 		//Cant read address.
-		//printf("cant read address.\n");
 		sigaction(SIGSEGV, &oldSignalHandler, NULL);
 		return -1;
 	}
@@ -145,13 +143,10 @@ int determineIfReadWriteAddressLocation(char * address)
 	//Determine if address is writable.
 	SignalValue = sigsetjmp(signalBuffer, 1);
 	if ( SignalValue == 0)
-	{
 		*address = readWriter;
-	}
 	else
 	{
 		//Cant write to address.
-		//printf("cant write address, but can read.\n");
 		sigaction(SIGSEGV, &oldSignalHandler, NULL);
 		return 0;
 	}

@@ -3,6 +3,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/mman.h>
 
 void createPattern3(unsigned char pattern, unsigned int patlength);
 
@@ -18,7 +19,7 @@ int main() {
 	unsigned int loclength = 10;
 	
 	FILE *f;
-	f = fopen("Test_Results2", "w");
+	f = fopen("Test_Results3", "w");
 	fprintf(f,"Test 3:\n");
 	unsigned int number = findpattern(pattern, patlength, locations, loclength);
 	
