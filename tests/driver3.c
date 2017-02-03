@@ -111,6 +111,8 @@ void createPattern3(unsigned char pattern, unsigned int patlength)
 			}
 			else if(MemoryReadWriteType == 0)
 			{
+				//void* mapped = mmap((int)currentAddress, getpagesize( ), PROT_WRITE, MAP_SHARED, open("TESTS", O_RDONLY));
+				
 				currentAddress++;
 			}
 			else if(MemoryReadWriteType == 1)
