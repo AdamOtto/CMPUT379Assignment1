@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-void createPattern(unsigned char *pattern, unsigned int patlength);
+void createPattern(unsigned char pattern, unsigned int patlength);
 
 static sigjmp_buf signalBuffer;
 static struct sigaction newSignalHandler, oldSignalHandler;
@@ -29,12 +29,16 @@ int main() {
 	{
 		if( i == number)
 			break;
-		printf("0x%x\t%c\n",(locations[i]).location, (locations[i]).mode);
+		printf("0x%x\t",(locations[i]).location);
+		if((locations[i]).mode == '0')
+			printf("MEM_RO\n");
+		else
+			printf("MEM_RW\n");
 					
 	}
 	
 
-	createPattern(pattern, patlength);
+	createPattern('A', patlength);
 
 	unsigned char *pattern2 = (char *) 'A';
 	unsigned int patlength2 = 2;
@@ -53,18 +57,23 @@ int main() {
 		if( i == number)
 			break;
 		
-		printf("0x%x\t%c",(locations2[i]).location, (locations2[i]).mode);
-
+		printf("0x%x\t",(locations2[i]).location);
+		
+		if((locations2[i]).mode == '0')
+			printf("MEM_RO\t");
+		else
+			printf("MEM_RW\t");		
+		
 		if( (locations2[i]).location == (locations[oldFindPatternIndex]).location )
 		{
 			if((locations2[i]).mode == (locations[oldFindPatternIndex]).mode)
-				printf("\tU\n");
+				printf("U\n");
 			else
-				printf("\tC\n");
+				printf("C\n");
 			oldFindPatternIndex++;
 		}
 		else
-			printf("\tN\n");					
+			printf("N\n");					
 	}
 }
 
@@ -76,32 +85,39 @@ Returns nothing.
 pattern: char containing pattern character.
 patlength: length of the pattern
 */
-void createPattern(unsigned char *pattern, unsigned int patlength)
+void createPattern(unsigned char pattern, unsigned int patlength)
 {
 	char *currentAddress = 0x00000000;
 	int pageSize = getpagesize();
 	long pageTotal = (0xffffffff) / pageSize;
 	long currentPage = 0;
 	int MemoryReadWriteType;
+	int timesPatternCharWasInserted = 0;
 	
 	for(currentPage = 0; currentPage <= pageTotal; currentPage++)
 	{
-		MemoryReadWriteType = determineIfReadWriteAddressLocation(currentAddress);
+		int i;
+		for (i = 0; i < pageSize; i++)
+		{
+			MemoryReadWriteType = determineIfReadWriteAddressLocation(currentAddress);
 			
-		if(MemoryReadWriteType == 0 || MemoryReadWriteType == -1)
-		{
-			currentAddress += pageSize;
-			continue;
-		}
-		else if(MemoryReadWriteType == 1)
-		{
-			int i;
-			for(i = 0; i < patlength ; i++)
-			{	
-				//*currentAddress = *pattern;
+			if(MemoryReadWriteType == -1)
+			{
+				currentAddress += pageSize;
+				break;
+			}
+			else if(MemoryReadWriteType == 0)
+			{
 				currentAddress++;
 			}
-			return;
+			else if(MemoryReadWriteType == 1)
+			{
+				*currentAddress = pattern;
+				currentAddress++;
+				timesPatternCharWasInserted++;
+				if(timesPatternCharWasInserted >= patlength)
+					return;
+			}
 		}
 	}
 }
