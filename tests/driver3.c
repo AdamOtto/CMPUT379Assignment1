@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-void createPattern(unsigned char pattern, unsigned int patlength);
+void createPattern3(unsigned char pattern, unsigned int patlength);
 
 static sigjmp_buf signalBuffer;
 static struct sigaction newSignalHandler, oldSignalHandler;
@@ -17,28 +17,29 @@ int main() {
 	struct patmatch locations[10];
 	unsigned int loclength = 10;
 	
-	
-	printf("Test 1:\n");
+	FILE *f;
+	f = fopen("Test_Results2", "w");
+	fprintf(f,"Test 3:\n");
 	unsigned int number = findpattern(pattern, patlength, locations, loclength);
 	
 	//First test	
-	printf("Pass 1\nTotal Matches: %d\n", number);
+	fprintf(f,"Pass 1\nTotal Matches: %d\n", number);
 	int i;
 		
 	for (i = 0; i < loclength; i++)
 	{
 		if( i == number)
 			break;
-		printf("0x%x\t",(locations[i]).location);
+		fprintf(f,"0x%x\t",(locations[i]).location);
 		if((locations[i]).mode == '0')
-			printf("MEM_RO\n");
+			fprintf(f,"MEM_RO\n");
 		else
-			printf("MEM_RW\n");
+			fprintf(f,"MEM_RW\n");
 					
 	}
 	
 
-	createPattern('A', patlength);
+	createPattern3('A', patlength);
 
 	unsigned char *pattern2 = (char *) 'A';
 	unsigned int patlength2 = 2;
@@ -47,9 +48,9 @@ int main() {
 	unsigned int loclength2 = 10;	
 	
 	//Second test with changes.
-	printf("Pass 2\n");
+	fprintf(f,"Pass 2\n");
 	number = findpattern(pattern2, patlength2, locations2, loclength2);
-	printf("Total Matches: %d\n", number);
+	fprintf(f,"Total Matches: %d\n", number);
 	int oldFindPatternIndex = 0;
 
 	for (i = 0; i < loclength2; i++)
@@ -57,24 +58,25 @@ int main() {
 		if( i == number)
 			break;
 		
-		printf("0x%x\t",(locations2[i]).location);
+		fprintf(f,"0x%x\t",(locations2[i]).location);
 		
 		if((locations2[i]).mode == '0')
-			printf("MEM_RO\t");
+			fprintf(f,"MEM_RO\t");
 		else
-			printf("MEM_RW\t");		
+			fprintf(f,"MEM_RW\t");		
 		
 		if( (locations2[i]).location == (locations[oldFindPatternIndex]).location )
 		{
 			if((locations2[i]).mode == (locations[oldFindPatternIndex]).mode)
-				printf("U\n");
+				fprintf(f,"U\n");
 			else
-				printf("C\n");
+				fprintf(f,"C\n");
 			oldFindPatternIndex++;
 		}
 		else
-			printf("N\n");					
+			fprintf(f,"N\n");					
 	}
+	fclose(f);
 }
 
 /*
@@ -85,7 +87,7 @@ Returns nothing.
 pattern: char containing pattern character.
 patlength: length of the pattern
 */
-void createPattern(unsigned char pattern, unsigned int patlength)
+void createPattern3(unsigned char pattern, unsigned int patlength)
 {
 	char *currentAddress = 0x00000000;
 	int pageSize = getpagesize();

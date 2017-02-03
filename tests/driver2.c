@@ -28,7 +28,7 @@ int main() {
 	fprintf(f,"Pass 1\nTotal Matches: %d\n", number);
 	
 	printf("Test 1:\n");
-	unsigned int number = findpattern(pattern, patlength, locations, loclength);
+	number = findpattern(pattern, patlength, locations, loclength);
 	
 	//First test	
 	printf("Pass 1\nTotal Matches: %d\n", number);
@@ -50,7 +50,7 @@ int main() {
 	
 
 
-	createPattern1('F', patlength);
+	createPattern2('F', patlength);
 
 	unsigned char *pattern2 = (char *) 'A';
 	unsigned int patlength2 = 2;
