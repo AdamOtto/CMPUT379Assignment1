@@ -1,13 +1,13 @@
-CC = gcc
-CFLAGS = -m32
+export CC = gcc
+export CFLAGS = -m32
 
 tests: findpattern.o drivers
 
-drivers: tests/driver*.c
-	cd tests && $(MAKE)
-
 findpattern.o: findpattern.c findpattern.h
 	$(CC) $(CFLAGS) -c $<
+
+drivers: tests/driver*.c
+	cd tests && $(MAKE)
 
 clean:
 	rm -f *.o *~
