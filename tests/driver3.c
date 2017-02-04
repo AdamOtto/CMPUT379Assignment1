@@ -7,18 +7,17 @@
 
 void createPattern3(unsigned char pattern, unsigned int patlength);
 
-int main() {
+int main(int argc, unsigned char *argv[]) {
 	//Initialize variables for the first call to find pattern
-	unsigned char *pattern = (char *) 'A';
+	unsigned char * pattern = (char *)argv[1];
 	unsigned int patlength = 2;
 	struct patmatch locations[10];
-	unsigned int loclength = 10;	
-	FILE *f;
-	f = fopen("Test_Results3", "w");
+	unsigned int loclength = 10;
 
 	//First test
 	printf("\nTest 3:\n");
-	unsigned int number = findpattern(pattern, patlength, locations, loclength);
+	unsigned int number = findpattern((char *)(long)(*pattern), patlength, locations, loclength);
+	
 	
 	//Display the patterns found	
 	printf("Pass 1\nTotal Matches: %d\n", number);
@@ -37,17 +36,17 @@ int main() {
 	}
 	
 	//Change the address space for the second test
-	createPattern3('A', patlength);
+	createPattern3(*pattern, patlength);
 
 	//Initialize variables for test 2
-	unsigned char *pattern2 = (char *) 'A';
+	unsigned char *pattern2 = pattern;
 	unsigned int patlength2 = 2;
 	struct patmatch locations2[10];
 	unsigned int loclength2 = 10;	
-	
+
 	//Second test with changes.
 	printf("Pass 2\n");
-	number = findpattern(pattern2, patlength2, locations2, loclength2);
+	number = findpattern((char *)(long)(*pattern), patlength2, locations2, loclength2);
 	printf("Total Matches: %d\n", number);
 	int oldFindPatternIndex = 0;
 
@@ -74,9 +73,9 @@ int main() {
 		else
 			printf("N\n");					
 	}
-	fclose(f);
-}
 
+	return 0;
+}
 /*
 Creates a new pattern at the first read/write location found.
 Maps read address's to write.
@@ -117,7 +116,7 @@ void createPattern3(unsigned char pattern, unsigned int patlength)
 				void* mapped = mmap(NULL, 8, PROT_WRITE, MAP_SHARED, (int)currentAddress, 0);
 				if(mapped != (void *)-1)	
 				{
-					mapped = pattern;
+					mapped = (void *)(long)pattern;
 				}
 				currentAddress++;
 			}

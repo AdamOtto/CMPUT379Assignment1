@@ -6,24 +6,20 @@
 
 void createPattern2(unsigned char pattern, unsigned int patlength);
 
-int main() {
+int main(int argc, unsigned char *argv[]) {
 	//Initialize variables for the first call to find pattern
-	unsigned char *pattern = (char *) 'F';
+	unsigned char * pattern = (char *)argv[1];
 	unsigned int patlength = 2;
 	struct patmatch locations[10];
-	unsigned int loclength = 10;	
-	FILE *f;
-	f = fopen("Test_Results2", "w");
-	
+	unsigned int loclength = 10;
+
 	//First test
 	printf("\nTest 2:\n");
-	unsigned int number = findpattern(pattern, patlength, locations, loclength);
-			
-	printf("Pass 1\n");
+	unsigned int number = findpattern((char *)(long)(*pattern), patlength, locations, loclength);
 	
-	//Display the patterns found
-	printf("Total Matches: %d\n", number);
-
+	
+	//Display the patterns found	
+	printf("Pass 1\nTotal Matches: %d\n", number);
 	int i;
 		
 	for (i = 0; i < loclength; i++)
@@ -32,25 +28,24 @@ int main() {
 			break;
 		printf("0x%x\t",(locations[i]).location);
 		if((locations[i]).mode == '0')
-			{printf("MEM_RO\n");}
+			printf("MEM_RO\n");
 		else
-			{printf("MEM_RW\n");}
-
+			printf("MEM_RW\n");
 					
 	}
 	
 	//Change the address space for the second test
-	createPattern2('F', patlength * 2);
+	createPattern2(*pattern, patlength);
 
 	//Initialize variables for test 2
-	unsigned char *pattern2 = (char *) 'F';
+	unsigned char *pattern2 = pattern;
 	unsigned int patlength2 = 2;
 	struct patmatch locations2[10];
 	unsigned int loclength2 = 10;	
-	
+
 	//Second test with changes.
 	printf("Pass 2\n");
-	number = findpattern(pattern2, patlength2, locations2, loclength2);
+	number = findpattern((char *)(long)(*pattern), patlength2, locations2, loclength2);
 	printf("Total Matches: %d\n", number);
 	int oldFindPatternIndex = 0;
 
@@ -69,7 +64,6 @@ int main() {
 		if( (locations2[i]).location == (locations[oldFindPatternIndex]).location )
 		{
 			if((locations2[i]).mode == (locations[oldFindPatternIndex]).mode)
-
 				printf("U\n");
 			else
 				printf("C\n");
@@ -78,11 +72,9 @@ int main() {
 		else
 			printf("N\n");					
 	}
-	char ch;
 
-	fclose(f);
+	return 0;
 }
-
 /*
 Creates a new pattern in all read/write location found.
 
