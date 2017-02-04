@@ -11,14 +11,14 @@ static struct sigaction newSignalHandler, oldSignalHandler;
 
 int main(int argc, unsigned char *argv[]) {
 	//Initialize variables for the first call to find pattern
-	unsigned char *pattern = argv[1];
+	unsigned char * pattern = (char *)argv[1];
 	unsigned int patlength = 2;
 	struct patmatch locations[10];
 	unsigned int loclength = 10;
 
 	//First test
 	printf("\nTest 1:\n");
-	unsigned int number = findpattern(pattern, patlength, locations, loclength);
+	unsigned int number = findpattern(*pattern, patlength, locations, loclength);
 	
 	
 	//Display the patterns found	
@@ -38,17 +38,17 @@ int main(int argc, unsigned char *argv[]) {
 	}
 	
 	//Change the address space for the second test
-	createPattern1('A', patlength);
+	createPattern1(*pattern, patlength);
 
 	//Initialize variables for test 2
-	unsigned char *pattern2 = (char *) 'A';
+	unsigned char *pattern2 = pattern;
 	unsigned int patlength2 = 2;
 	struct patmatch locations2[10];
 	unsigned int loclength2 = 10;	
-	
+
 	//Second test with changes.
 	printf("Pass 2\n");
-	number = findpattern(pattern2, patlength2, locations2, loclength2);
+	number = findpattern(*pattern, patlength2, locations2, loclength2);
 	printf("Total Matches: %d\n", number);
 	int oldFindPatternIndex = 0;
 
@@ -75,9 +75,8 @@ int main(int argc, unsigned char *argv[]) {
 		else
 			printf("N\n");					
 	}
-	char ch;
 
-	fclose(f);
+	return 0;
 }
 
 /*
