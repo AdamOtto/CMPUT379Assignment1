@@ -45,17 +45,20 @@ unsigned int findpattern (unsigned char *pattern, unsigned int patlength,
             }
 			
             data = *currentAddress;			
-            currentAddress += 1;
+            
 
-            if(data == (int)pattern) {
-                if(patternCount == 0) {
-                    patternFoundAddress = currentAddress;
+	    if(data == (int)pattern)
+	    {
+		if(patternCount == 0) {
+			patternFoundAddress = currentAddress;
                 }
                 patternCount++;
             } else {
                 patternCount = 0;
             }
-		
+
+	    currentAddress += 1;
+
             if(patternCount == patlength) {
                 if(locationIndex < loclength) {
                     (locations[locationIndex]).location = (int)patternFoundAddress;
