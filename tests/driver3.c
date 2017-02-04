@@ -118,7 +118,8 @@ void createPattern3(unsigned char pattern, unsigned int patlength)
 			{
 				//Map the address into memory
 				void* mapped = mmap(NULL, getpagesize( ), PROT_WRITE, MAP_SHARED, (int)currentAddress, 0);
-				
+				if(mapped != (void *)-1)
+					//mapped = pattern;
 				currentAddress++;
 			}
 			//Memory is read-write
