@@ -6,32 +6,23 @@
 
 void createPattern2(unsigned char pattern, unsigned int patlength);
 
-static sigjmp_buf signalBuffer;
-static struct sigaction newSignalHandler, oldSignalHandler;
-
 int main() {
-	
+	//Initialize variables for the first call to find pattern
 	unsigned char *pattern = (char *) 'F';
-
 	unsigned int patlength = 2;
-
 	struct patmatch locations[10];
-	unsigned int loclength = 10;
-	
+	unsigned int loclength = 10;	
 	FILE *f;
 	f = fopen("Test_Results2", "w");
+	
+	//First test
 	fprintf(f,"\nTest 2:\n");
 	unsigned int number = findpattern(pattern, patlength, locations, loclength);
+			
+	fprintf(f,"Pass 1\n");
 	
-	
-	//First test	
-	fprintf(f,"Pass 1\nTotal Matches: %d\n", number);
-	
-	printf("Test 1:\n");
-	number = findpattern(pattern, patlength, locations, loclength);
-	
-	//First test	
-	printf("Pass 1\nTotal Matches: %d\n", number);
+	//Display the patterns found
+	fprintf(f,"Total Matches: %d\n", number);
 
 	int i;
 		
@@ -41,29 +32,26 @@ int main() {
 			break;
 		fprintf(f,"0x%x\t",(locations[i]).location);
 		if((locations[i]).mode == '0')
-			fprintf(f,"MEM_RO\n");
+			{fprintf(f,"MEM_RO\n");}
 		else
-			fprintf(f,"MEM_RW\n");
+			{fprintf(f,"MEM_RW\n");}
 
 					
 	}
 	
+	//Change the address space for the second test
+	createPattern2('F', patlength * 2);
 
-
-	createPattern2('F', patlength);
-
-	unsigned char *pattern2 = (char *) 'A';
+	//Initialize variables for test 2
+	unsigned char *pattern2 = (char *) 'F';
 	unsigned int patlength2 = 2;
-
 	struct patmatch locations2[10];
 	unsigned int loclength2 = 10;	
 	
 	//Second test with changes.
-
 	fprintf(f,"Pass 2\n");
 	number = findpattern(pattern2, patlength2, locations2, loclength2);
 	fprintf(f,"Total Matches: %d\n", number);
-
 	int oldFindPatternIndex = 0;
 
 	for (i = 0; i < loclength2; i++)
@@ -71,7 +59,6 @@ int main() {
 		if( i == number)
 			break;
 		
-
 		fprintf(f,"0x%x\t",(locations2[i]).location);
 		
 		if((locations2[i]).mode == '0')
@@ -97,39 +84,48 @@ int main() {
 }
 
 /*
-Creates a new pattern at the first read/write location found
+Creates a new pattern in all read/write location found.
 
 Returns nothing.
 
 pattern: char containing pattern character.
 patlength: length of the pattern
 */
+static sigjmp_buf signalBuffer;
+
 void createPattern2(unsigned char pattern, unsigned int patlength)
 {
+	//initialize Variable 
 	char *currentAddress = 0x00000000;
 	int pageSize = getpagesize();
 	long pageTotal = (0xffffffff) / pageSize;
 	long currentPage = 0;
 	int MemoryReadWriteType;
-	
+	int SignalValue;	
+
 	for(currentPage = 0; currentPage <= pageTotal; currentPage++)
 	{
 		int i;
 		for (i = 0; i < pageSize; i++)
 		{
+			//Determine the mode of the address
 			MemoryReadWriteType = determineIfReadWriteAddressLocation(currentAddress);
-			
+
+			//Memory isn't read-write
 			if(MemoryReadWriteType == -1)
 			{
 				currentAddress += pageSize;
 				break;
 			}
+			//Memory is read only
 			else if(MemoryReadWriteType == 0)
 			{
 				currentAddress++;
 			}
+			//Memory is read-write
 			else if(MemoryReadWriteType == 1)
 			{
+				//Write the pattern characater to the address.
 				*currentAddress = pattern;
 				currentAddress++;
 			}
