@@ -1,5 +1,5 @@
 export
-p = a
+p = A
 CC = gcc
 CFLAGS = -m32
 

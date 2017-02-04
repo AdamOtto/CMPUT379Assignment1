@@ -9,16 +9,16 @@ void createPattern1(unsigned char pattern, unsigned int patlength);
 static sigjmp_buf signalBuffer;
 static struct sigaction newSignalHandler, oldSignalHandler;
 
-int main(int argc, unsigned char *argv[]) {
+int main(int argc, unsigned char **argv) {
 	//Initialize variables for the first call to find pattern
-	unsigned char * pattern = (char *)argv[1];
+	unsigned char *pattern = &argv[1];
 	unsigned int patlength = 2;
 	struct patmatch locations[10];
 	unsigned int loclength = 10;
 
 	//First test
 	printf("\nTest 1:\n");
-	unsigned int number = findpattern(*pattern, patlength, locations, loclength);
+	unsigned int number = findpattern((unsigned char *)pattern, patlength, locations, loclength);
 	
 	
 	//Display the patterns found	
@@ -48,7 +48,7 @@ int main(int argc, unsigned char *argv[]) {
 
 	//Second test with changes.
 	printf("Pass 2\n");
-	number = findpattern(*pattern, patlength2, locations2, loclength2);
+	number = findpattern((unsigned char *)pattern, patlength2, locations2, loclength2);
 	printf("Total Matches: %d\n", number);
 	int oldFindPatternIndex = 0;
 
