@@ -6,12 +6,15 @@
 
 void createPattern1(unsigned char pattern, unsigned int patlength);
 
-int main(int argc, char *argv[]) {
+static sigjmp_buf signalBuffer;
+static struct sigaction newSignalHandler, oldSignalHandler;
+
+int main(int argc, unsigned char *argv[]) {
 	//Initialize variables for the first call to find pattern
 	unsigned char * pattern = (char *)argv[1];
 	unsigned int patlength = 2;
 	struct patmatch locations[10];
-	unsigned int loclength = 10;	
+	unsigned int loclength = 10;
 
 	//First test
 	printf("\nTest 1:\n");
