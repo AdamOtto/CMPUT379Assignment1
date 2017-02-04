@@ -19,23 +19,23 @@ int main(int argc, char *argv[]) {
 	f = fopen("Test_Results1", "w");
 
 	//First test
-	fprintf(f,"\nTest 1:\n");
+	printf("\nTest 1:\n");
 	unsigned int number = findpattern(pattern, patlength, locations, loclength);
 	
 	
 	//Display the patterns found	
-	fprintf(f,"Pass 1\nTotal Matches: %d\n", number);
+	printf("Pass 1\nTotal Matches: %d\n", number);
 	int i;
 		
 	for (i = 0; i < loclength; i++)
 	{
 		if( i == number)
 			break;
-		fprintf(f,"0x%x\t",(locations[i]).location);
+		printf("0x%x\t",(locations[i]).location);
 		if((locations[i]).mode == '0')
-			fprintf(f,"MEM_RO\n");
+			printf("MEM_RO\n");
 		else
-			fprintf(f,"MEM_RW\n");
+			printf("MEM_RW\n");
 					
 	}
 	
@@ -49,9 +49,9 @@ int main(int argc, char *argv[]) {
 	unsigned int loclength2 = 10;	
 	
 	//Second test with changes.
-	fprintf(f,"Pass 2\n");
+	printf("Pass 2\n");
 	number = findpattern(pattern2, patlength2, locations2, loclength2);
-	fprintf(f,"Total Matches: %d\n", number);
+	printf("Total Matches: %d\n", number);
 	int oldFindPatternIndex = 0;
 
 	for (i = 0; i < loclength2; i++)
@@ -59,23 +59,23 @@ int main(int argc, char *argv[]) {
 		if( i == number)
 			break;
 		
-		fprintf(f,"0x%x\t",(locations2[i]).location);
+		printf("0x%x\t",(locations2[i]).location);
 		
 		if((locations2[i]).mode == '0')
-			fprintf(f,"MEM_RO\t");
+			printf("MEM_RO\t");
 		else
-			fprintf(f,"MEM_RW\t");		
+			printf("MEM_RW\t");		
 		
 		if( (locations2[i]).location == (locations[oldFindPatternIndex]).location )
 		{
 			if((locations2[i]).mode == (locations[oldFindPatternIndex]).mode)
-				fprintf(f,"U\n");
+				printf("U\n");
 			else
-				fprintf(f,"C\n");
+				printf("C\n");
 			oldFindPatternIndex++;
 		}
 		else
-			fprintf(f,"N\n");					
+			printf("N\n");					
 	}
 	char ch;
 
