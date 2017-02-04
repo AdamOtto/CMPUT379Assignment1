@@ -11,7 +11,7 @@ static struct sigaction newSignalHandler, oldSignalHandler;
 
 int main(int argc, unsigned char *argv[]) {
 	//Initialize variables for the first call to find pattern
-	unsigned char *pattern = &argv[1];
+	unsigned char *pattern = (unsigned char *) argv[1];
 	unsigned int patlength = 2;
 	struct patmatch locations[10];
 	unsigned int loclength = 10;
