@@ -1,21 +1,21 @@
 VPATH = .:../
 
-all: driver1 driver2 driver3
+all: drivers
 
 %.o: %.c findpattern.h
 	$(CC) $(CFLAGS) -c $<
 
-driver1: findpattern.o driver1.o
+drivers: findpattern.o driver1.o driver2.o driver3.o
+	$(CC) $(CFLAGS) driver1.o $< -o driver1
+	$(CC) $(CFLAGS) driver2.o $< -o driver2
+	$(CC) $(CFLAGS) driver3.o $< -o driver3
+	./driver1 > test_results.txt
+	./driver2 >> test_results.txt
+	./driver3 >> test_results.txt
+	
+driver%: driver%.o findpattern.o
 	$(CC) $(CFLAGS) $^ -o $@
-	#./driver1
-
-driver2: findpattern.o driver2.o
-	$(CC) $(CFLAGS) $^ -o $@
-	#./driver2
-
-driver3: findpattern.o driver3.o
-	$(CC) $(CFLAGS) $^ -o $@
-	#./driver3
+	./$@
 
 clean:
 	rm -f *~ *.o
