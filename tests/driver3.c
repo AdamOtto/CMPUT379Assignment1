@@ -7,9 +7,6 @@
 
 void createPattern3(unsigned char pattern, unsigned int patlength);
 
-static sigjmp_buf signalBuffer;
-static struct sigaction newSignalHandler, oldSignalHandler;
-
 int main() {
 	//Initialize variables for the first call to find pattern
 	unsigned char *pattern = (char *) 'A';
