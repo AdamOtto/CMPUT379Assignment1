@@ -1,5 +1,7 @@
-export CC = gcc
-export CFLAGS = -m32
+export
+p = a
+CC = gcc
+CFLAGS = -m32
 
 tests: findpattern.o drivers
 test1: findpattern.o driver1

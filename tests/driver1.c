@@ -9,9 +9,9 @@ void createPattern1(unsigned char pattern, unsigned int patlength);
 static sigjmp_buf signalBuffer;
 static struct sigaction newSignalHandler, oldSignalHandler;
 
-int main() {
+int main(int argc, char *argv[]) {
 	//Initialize variables for the first call to find pattern
-	unsigned char *pattern = (char *) 'A';
+	unsigned char *pattern = argv[1];
 	unsigned int patlength = 2;
 	struct patmatch locations[10];
 	unsigned int loclength = 10;	
