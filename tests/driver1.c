@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 
 	//First test
 	printf("\nTest 1:\n");
-	unsigned int number = findpattern(*pattern, patlength, locations, loclength);
+	unsigned int number = findpattern((char *)(long)(*pattern), patlength, locations, loclength);
 	
 	
 	//Display the patterns found	
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 
 	//Second test with changes.
 	printf("Pass 2\n");
-	number = findpattern(*pattern, patlength2, locations2, loclength2);
+	number = findpattern((char *)(long)(*pattern), patlength2, locations2, loclength2);
 	printf("Total Matches: %d\n", number);
 	int oldFindPatternIndex = 0;
 
@@ -111,7 +111,7 @@ void createPattern1(unsigned char pattern, unsigned int patlength)
 			//Memory is read only
 			else if(MemoryReadWriteType == 0)
 			{
-				currentAddress++;
+				currentAddress += pageSize;
 			}
 			//Memory is read-write
 			else if(MemoryReadWriteType == 1)
