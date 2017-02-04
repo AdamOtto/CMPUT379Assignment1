@@ -9,7 +9,7 @@ void createPattern1(unsigned char pattern, unsigned int patlength);
 static sigjmp_buf signalBuffer;
 static struct sigaction newSignalHandler, oldSignalHandler;
 
-int main(int argc, unsigned char **argv) {
+int main(int argc, unsigned char *argv[]) {
 	//Initialize variables for the first call to find pattern
 	unsigned char *pattern = &argv[1];
 	unsigned int patlength = 2;
@@ -18,9 +18,9 @@ int main(int argc, unsigned char **argv) {
 
 	//First test
 	printf("\nTest 1:\n");
-	unsigned int number = findpattern((unsigned char *)pattern, patlength, locations, loclength);
-	
-	
+
+	unsigned int number = findpattern((char *)(long)(*pattern), patlength, locations, loclength);
+
 	//Display the patterns found	
 	printf("Pass 1\nTotal Matches: %d\n", number);
 	int i;
@@ -48,7 +48,7 @@ int main(int argc, unsigned char **argv) {
 
 	//Second test with changes.
 	printf("Pass 2\n");
-	number = findpattern((unsigned char *)pattern, patlength2, locations2, loclength2);
+	number = findpattern((char *)(long)(*pattern), patlength2, locations2, loclength2);
 	printf("Total Matches: %d\n", number);
 	int oldFindPatternIndex = 0;
 
@@ -114,7 +114,7 @@ void createPattern1(unsigned char pattern, unsigned int patlength)
 			//Memory is read only
 			else if(MemoryReadWriteType == 0)
 			{
-				currentAddress++;
+				currentAddress += pageSize;
 			}
 			//Memory is read-write
 			else if(MemoryReadWriteType == 1)
