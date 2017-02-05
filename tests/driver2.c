@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include <unistd.h>
 
-void createPattern2(unsigned char pattern, unsigned int patlength);
-
 int main(int argc, unsigned char *argv[]) {
 	//Initialize variables for the first call to find pattern
 	unsigned char * pattern = (char *)argv[1];
@@ -34,8 +32,9 @@ int main(int argc, unsigned char *argv[]) {
 					
 	}
 	
-	//Change the address space for the second test
-	createPattern2(*pattern, patlength);
+	//Adds an instance of the pattern on the stack by creating two new variables.
+	char a1 = *argv[1];
+	char a2 = *argv[1];
 
 	//Initialize variables for test 2
 	unsigned char *pattern2 = pattern;
@@ -74,53 +73,4 @@ int main(int argc, unsigned char *argv[]) {
 	}
 
 	return 0;
-}
-/*
-Creates a new pattern in all read/write location found.
-
-Returns nothing.
-
-pattern: char containing pattern character.
-patlength: length of the pattern
-*/
-static sigjmp_buf signalBuffer;
-
-void createPattern2(unsigned char pattern, unsigned int patlength)
-{
-	//initialize Variable 
-	char *currentAddress = 0x00000000;
-	int pageSize = getpagesize();
-	long pageTotal = (0xffffffff) / pageSize;
-	long currentPage = 0;
-	int MemoryReadWriteType;
-	int SignalValue;	
-
-	for(currentPage = 0; currentPage <= pageTotal; currentPage++)
-	{
-		int i;
-		for (i = 0; i < pageSize; i++)
-		{
-			//Determine the mode of the address
-			MemoryReadWriteType = determineIfReadWriteAddressLocation(currentAddress);
-
-			//Memory isn't read-write
-			if(MemoryReadWriteType == -1)
-			{
-				currentAddress += pageSize;
-				break;
-			}
-			//Memory is read only
-			else if(MemoryReadWriteType == 0)
-			{
-				currentAddress++;
-			}
-			//Memory is read-write
-			else if(MemoryReadWriteType == 1)
-			{
-				//Write the pattern characater to the address.
-				//*currentAddress = pattern;
-				currentAddress++;
-			}
-		}
-	}
 }
