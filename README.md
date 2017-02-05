@@ -1,7 +1,6 @@
 CMPUT379, Assignment 1, Winter 2017
 ===================================
-Justin Stuehmer
-Adam Otto
+Justin Stuehmer & Adam Otto
 
 The findpattern() function will reference all locations in
 the address space of the process and, while doing so, it
