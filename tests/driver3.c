@@ -2,6 +2,9 @@
 #include <setjmp.h>
 #include <signal.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
 
@@ -36,8 +39,21 @@ int main(int argc, unsigned char *argv[]) {
 	}
 	
 	//Change the address space for the second test
-	createPattern3(*pattern, patlength);
-
+	struct stat sb;
+	int fd = open("driver3test", O_RDONLY);
+	if(fd == -1)
+		printf("Could not open driver3File.\n");
+	else
+	{
+		if(fstat(fd, &sb) == -1)
+			printf("fstat Error.");
+	}
+	//Map the address into memory
+	char* mapped = mmap(0, sb.st_size, PROT_READ, MAP_SHARED, fd, 0);
+	if(mapped == MAP_FAILED)	
+		printf("Could not map file.\n");	
+	
+	
 	//Initialize variables for test 2
 	unsigned char *pattern2 = pattern;
 	unsigned int patlength2 = 2;
@@ -73,62 +89,8 @@ int main(int argc, unsigned char *argv[]) {
 		else
 			printf("N\n");					
 	}
-
-	return 0;
-}
-/*
-Creates a new pattern at the first read/write location found.
-Maps read address's to write.
-
-Returns nothing.
-
-pattern: char containing pattern character.
-patlength: length of the pattern
-*/
-void createPattern3(unsigned char pattern, unsigned int patlength)
-{
-	//initialize Variable
-	char *currentAddress = 0x00000000;
-	int pageSize = getpagesize();
-	long pageTotal = (0xffffffff) / pageSize;
-	long currentPage = 0;
-	int MemoryReadWriteType;
-	int timesPatternCharWasInserted = 0;
 	
-	for(currentPage = 0; currentPage <= pageTotal; currentPage++)
-	{
-		int i;
-		for (i = 0; i < pageSize; i++)
-		{
-			//Determine the mode of the address
-			MemoryReadWriteType = determineIfReadWriteAddressLocation(currentAddress);
-			
-			//Memory isn't read-write
-			if(MemoryReadWriteType == -1)
-			{
-				currentAddress += pageSize;
-				break;
-			}
-			//Memory is read only
-			else if(MemoryReadWriteType == 0)
-			{
-				//Map the address into memory
-				void* mapped = mmap(NULL, 8, PROT_WRITE, MAP_SHARED, (int)currentAddress, 0);
-				if(mapped != (void *)-1)	
-				{
-					mapped = (void *)(long)pattern;
-				}
-				currentAddress++;
-			}
-			//Memory is read-write
-			else if(MemoryReadWriteType == 1)
-			{
-				*currentAddress = pattern;
-				currentAddress++;
-				timesPatternCharWasInserted++;
-				if(timesPatternCharWasInserted >= patlength)
-					return;
-			}
-		}
-	}
+	munmap(mapped, sb.st_size);
+	close(fd);
+	return 0;
 }
