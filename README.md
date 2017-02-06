@@ -7,8 +7,8 @@ the address space of the process and, while doing so, it
 will determine the locations of the occurrences of the given
 pattern.
 
-$ make tests
-Produces output to test_results.txt in tests driectory
+	$ make tests
+	Produces output to tests/test_results.txt
 
 In the tests subdirectory, is a file TESTS.txt that explains
 the different driver programs.
