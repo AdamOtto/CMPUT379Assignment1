@@ -19,4 +19,5 @@ driver%: driver%.o findpattern.o
 
 clean:
 	rm -f *~ *.o
+	rm test_results.txt
 	rm driver?

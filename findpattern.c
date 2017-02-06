@@ -34,19 +34,19 @@ unsigned int findpattern (unsigned char *pattern, unsigned int patlength,
     int MemoryReadWriteType;
     int patternFoundCount = 0;	
 
-    for(currentPage = 0; currentPage <= pageTotal; currentPage++) {
+    for (currentPage = 0; currentPage <= pageTotal; currentPage++) {
         long i;	
-        for(i = 0; i < pageSize; i++) {
+        for (i = 0; i < pageSize; i++) {
             MemoryReadWriteType = determineIfReadWriteAddressLocation(currentAddress);
 			
-            if(MemoryReadWriteType == -1) {
+            if (MemoryReadWriteType == -1) {
                 currentAddress += pageSize;
                 break;
             }
             data = *currentAddress;			
 
-            if(data == (int)pattern) {
-                if(patternCount == 0) {
+            if (data == (int)pattern) {
+                if (patternCount == 0) {
                     patternFoundAddress = currentAddress;
                 }
                 patternCount++;
@@ -56,10 +56,10 @@ unsigned int findpattern (unsigned char *pattern, unsigned int patlength,
 
             currentAddress += 1;
 
-            if(patternCount == patlength) {
-                if(locationIndex < loclength) {
+            if (patternCount == patlength) {
+                if (locationIndex < loclength) {
                     (locations[locationIndex]).location = (int)patternFoundAddress;
-                    if(MemoryReadWriteType == MEM_RW) {
+                    if (MemoryReadWriteType == MEM_RW) {
                         (locations[locationIndex]).mode = '0'; // MEM_RW;
                     } else {
                         (locations[locationIndex]).mode = '1'; // MEM_RO;
@@ -98,7 +98,7 @@ int determineIfReadWriteAddressLocation(char * address) {
 
     // Determine if address is readable.
     int SignalValue = sigsetjmp(signalBuffer, 1);
-    if ( SignalValue == 0) {
+    if (SignalValue == 0) {
         readWriter = *address;
     } else {
         // Cant read address.
@@ -108,7 +108,7 @@ int determineIfReadWriteAddressLocation(char * address) {
 
     // Determine if address is writable.
     SignalValue = sigsetjmp(signalBuffer, 1);
-    if ( SignalValue == 0)
+    if (SignalValue == 0)
         *address = readWriter;
     else {
         //Cant write to address.
