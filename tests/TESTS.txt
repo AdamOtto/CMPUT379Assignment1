@@ -1,0 +1,9 @@
+Driver 1:
+Goes through all address spaces and creates a single instance of the pattern at the first read/write addresses found.
+
+Driver 2:
+Adds a new instance of the pattern on the memory stack by creating new variables in the main function.
+
+Driver 3:
+Using mmap, maps a file containing the pattern into an address space as a read onlye. Then rewrites it to be a read-write.
+Only works if the pattern is two side-by-side 'A' characters.

@@ -17,12 +17,28 @@ int main(int argc, unsigned char *argv[]) {
 	struct patmatch locations[10];
 	unsigned int loclength = 10;
 
-	//First test
+	//Change the address space for the first test using mmap.
+	struct stat sb;
+	int fd = open("driver3test",O_RDWR);
+	if(fd == -1)
+		printf("Could not open driver3File.\n");
+	else
+	{
+		if(fstat(fd, &sb) == -1)
+			printf("fstat Error.");
+	}
+	//Map the address into memory.
+	char* mapped = mmap(0, sb.st_size, PROT_READ, MAP_SHARED, fd, 0);
+	if(mapped == MAP_FAILED)	
+		printf("Could not map file.\n");
+
+	//First test.
 	printf("\nTest 3:\n");
 	unsigned int number = findpattern((char *)(long)(*pattern), patlength, locations, loclength);
 	
+	munmap(mapped, sb.st_size);
 	
-	//Display the patterns found	
+	//Display the patterns found.	
 	printf("Pass 1\nTotal Matches: %d\n", number);
 	int i;
 		
@@ -38,23 +54,13 @@ int main(int argc, unsigned char *argv[]) {
 					
 	}
 	
-	//Change the address space for the second test
-	struct stat sb;
-	int fd = open("driver3test", O_RDONLY);
-	if(fd == -1)
-		printf("Could not open driver3File.\n");
-	else
-	{
-		if(fstat(fd, &sb) == -1)
-			printf("fstat Error.");
-	}
-	//Map the address into memory
-	char* mapped = mmap(0, sb.st_size, PROT_READ, MAP_SHARED, fd, 0);
+	//Change the address space for the second test using mmap.
+	mmap(0, sb.st_size, PROT_WRITE, MAP_SHARED, fd, 0);
 	if(mapped == MAP_FAILED)	
 		printf("Could not map file.\n");	
 	
 	
-	//Initialize variables for test 2
+	//Initialize variables for test 2.
 	unsigned char *pattern2 = pattern;
 	unsigned int patlength2 = 2;
 	struct patmatch locations2[10];
