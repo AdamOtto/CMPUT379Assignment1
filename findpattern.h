@@ -10,6 +10,6 @@ struct patmatch {
 };
 
 unsigned int findpattern (unsigned char *pattern, unsigned int patlength,
-			  struct patmatch *locations, unsigned int loclength);
+                          struct patmatch *locations, unsigned int loclength);
 
 #endif

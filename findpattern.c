@@ -20,7 +20,7 @@ static struct sigaction newSignalHandler, oldSignalHandler;
  * locations: array of patmatch
  * loclength: length of locations array */
 unsigned int findpattern (unsigned char *pattern, unsigned int patlength,
-			  struct patmatch *locations, unsigned int loclength) {
+                          struct patmatch *locations, unsigned int loclength) {
 
     char *currentAddress = 0x00000000;
     char *patternFoundAddress = 0x00000000;
@@ -43,21 +43,18 @@ unsigned int findpattern (unsigned char *pattern, unsigned int patlength,
                 currentAddress += pageSize;
                 break;
             }
-			
             data = *currentAddress;			
-            
 
-	    if(data == (int)pattern)
-	    {
-		if(patternCount == 0) {
-			patternFoundAddress = currentAddress;
+            if(data == (int)pattern) {
+                if(patternCount == 0) {
+                    patternFoundAddress = currentAddress;
                 }
                 patternCount++;
             } else {
                 patternCount = 0;
             }
 
-	    currentAddress += 1;
+            currentAddress += 1;
 
             if(patternCount == patlength) {
                 if(locationIndex < loclength) {
@@ -71,7 +68,7 @@ unsigned int findpattern (unsigned char *pattern, unsigned int patlength,
                 }
                 patternFoundCount++;
             }
-	}
+        }
     }
     return patternFoundCount;
 }
@@ -90,7 +87,7 @@ void handler(int signalNum) {
  * address: char containing the address to scan */
 int determineIfReadWriteAddressLocation(char * address) {
     char readWriter;
-	
+
     newSignalHandler.sa_handler = handler;
     sigemptyset(&newSignalHandler.sa_mask);
     newSignalHandler.sa_flags = 0;
@@ -108,7 +105,7 @@ int determineIfReadWriteAddressLocation(char * address) {
         sigaction(SIGSEGV, &oldSignalHandler, NULL);
         return -1;
     }
-	
+
     // Determine if address is writable.
     SignalValue = sigsetjmp(signalBuffer, 1);
     if ( SignalValue == 0)
@@ -118,7 +115,7 @@ int determineIfReadWriteAddressLocation(char * address) {
         sigaction(SIGSEGV, &oldSignalHandler, NULL);
         return 0;
     }
-	
+
     sigaction(SIGSEGV, &oldSignalHandler, NULL);
     return 1;
 }
