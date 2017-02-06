@@ -68,7 +68,8 @@ int main(int argc, unsigned char *argv[]) {
             }
             oldFindPatternIndex++;
         } else {
-            printf("N\n");					
+            printf("N\n");
+        }					
     }
     return 0;
 }
